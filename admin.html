@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Quản lý Thư viện</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .tab-button.active { 
+            background-color: #3b82f6; 
+            color: white; 
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-lg border-b-4 border-blue-500">
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-blue-500 p-3 rounded-lg">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-800">Quản lý Thư viện</h1>
+                        <p class="text-gray-600">Hệ thống quản lý sách và độc giả</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm text-gray-600">Xin chào, Admin</p>
+                    <p class="text-xs text-gray-500">Hôm nay: <span id="current-date"></span></p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex space-x-1">
+                <button onclick="showTab('books')" class="tab-button active px-6 py-4 text-sm font-medium rounded-t-lg transition-colors hover:bg-gray-100">
+                    📚 Quản lý Sách
+                </button>
+                <button onclick="showTab('readers')" class="tab-button px-6 py-4 text-sm font-medium rounded-t-lg transition-colors hover:bg-gray-100">
+                    👥 Quản lý Độc giả
+                </button>
+                <button onclick="showTab('borrow')" class="tab-button px-6 py-4 text-sm font-medium rounded-t-lg transition-colors hover:bg-gray-100">
+                    📋 Mượn/Trả Sách
+                </button>
+                <button onclick="showTab('reports')" class="tab-button px-6 py-4 text-sm font-medium rounded-t-lg transition-colors hover:bg-gray-100">
+                    📊 Báo cáo
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Books Management Tab -->
+        <div id="books" class="tab-content active">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Add Book Form -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <span class="bg-green-100 p-2 rounded-lg mr-3">➕</span>
+                        Thêm Sách Mới
+                    </h2>
+                    <form method="POST" action="/books/add/" class="space-y-4">
+                        <!-- Django CSRF token sẽ được thêm ở đây -->
+                        {% csrf_token %}
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tên sách</label>
+                            <input type="text" name="title" required 
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="Nhập tên sách...">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tác giả</label>
+                            <input type="text" name="author" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="Nhập tên tác giả...">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">ISBN</label>
+                                <input type="text" name="isbn" required
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                       placeholder="ISBN...">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Số lượng</label>
+                                <input type="number" name="quantity" required min="1"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                       placeholder="1">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Thể loại</label>
+                            <select name="category" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="">Chọn thể loại...</option>
+                                <option value="fiction">Tiểu thuyết</option>
+                                <option value="science">Khoa học</option>
+                                <option value="history">Lịch sử</option>
+                                <option value="technology">Công nghệ</option>
+                                <option value="literature">Văn học</option>
+                                <option value="education">Giáo dục</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Mô tả</label>
+                            <textarea name="description" rows="3"
+                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                      placeholder="Mô tả ngắn về sách..."></textarea>
+                        </div>
+                        
+                        <button type="submit" 
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
+                            Thêm Sách
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Search Books -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <span class="bg-blue-100 p-2 rounded-lg mr-3">🔍</span>
+                        Tìm Kiếm Sách
+                    </h2>
+                    <form method="GET" action="/books/search/" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Từ khóa</label>
+                            <input type="text" name="query"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="Tìm theo tên sách, tác giả, ISBN...">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Lọc theo thể loại</label>
+                            <select name="category"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="">Tất cả thể loại</option>
+                                <option value="fiction">Tiểu thuyết</option>
+                                <option value="science">Khoa học</option>
+                                <option value="history">Lịch sử</option>
+                                <option value="technology">Công nghệ</option>
+                                <option value="literature">Văn học</option>
+                                <option value="education">Giáo dục</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" 
+                                class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
+                            Tìm Kiếm
+                        </button>
+                    </form>
+
+                    <!-- Sample Book List -->
+                    <div class="mt-8">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Sách mới nhất</h3>
+                        <div class="space-y-3">
+                            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-medium text-gray-800">Lập trình Python cơ bản</h4>
+                                        <p class="text-sm text-gray-600">Tác giả: Nguyễn Văn A</p>
+                                        <p class="text-xs text-gray-500">ISBN: 978-0123456789</p>
+                                    </div>
+                                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Còn: 5</span>
+                                </div>
+                            </div>
+                            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-medium text-gray-800">Lịch sử Việt Nam</h4>
+                                        <p class="text-sm text-gray-600">Tác giả: Trần Thị B</p>
+                                        <p class="text-xs text-gray-500">ISBN: 978-0987654321</p>
+                                    </div>
+                                    <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Còn: 2</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Readers Management Tab -->
+        <div id="readers" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Add Reader Form -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <span class="bg-purple-100 p-2 rounded-lg mr-3">👤</span>
+                        Đăng ký Độc giả Mới
+                    </h2>
+                    <form method="POST" action="/readers/add/" class="space-y-4">
+                        {% csrf_token %}
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Họ và tên</label>
+                            <input type="text" name="full_name" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                   placeholder="Nhập họ và tên...">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
+                                <input type="tel" name="phone" required
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                       placeholder="0123456789">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">CCCD/CMND</label>
+                                <input type="text" name="id_number" required
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                       placeholder="123456789">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input type="email" name="email" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                   placeholder="email@example.com">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Địa chỉ</label>
+                            <textarea name="address" rows="3" required
+                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                      placeholder="Nhập địa chỉ đầy đủ..."></textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Loại thẻ</label>
+                            <select name="card_type" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                <option value="">Chọn loại thẻ...</option>
+                                <option value="student">Học sinh/Sinh viên</option>
+                                <option value="teacher">Giáo viên</option>
+                                <option value="adult">Người lớn</option>
+                                <option value="senior">Người cao tuổi</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" 
+                                class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
+                            Đăng ký Thẻ
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Search Readers -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <span class="bg-orange-100 p-2 rounded-lg mr-3">🔍</span>
+                        Tìm Kiếm Độc giả
+                    </h2>
+                    <form method="GET" action="/readers/search/" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Từ khóa</label>
+                            <input type="text" name="query"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                   placeholder="Tìm theo tên, số điện thoại, CCCD...">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Loại thẻ</label>
+                            <select name="card_type"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                                <option value="">Tất cả loại thẻ</option>
+                                <option value="student">Học sinh/Sinh viên</option>
+                                <option value="teacher">Giáo viên</option>
+                                <option value="adult">Người lớn</option>
+                                <option value="senior">Người cao tuổi</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" 
+                                class="w-full bg-orange-600 hover:bg-orange-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
+                            Tìm Kiếm
+                        </button>
+                    </form>
+
+                    <!-- Sample Reader List -->
+                    <div class="mt-8">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Độc giả mới</h3>
+                        <div class="space-y-3">
+                            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-medium text-gray-800">Nguyễn Văn Nam</h4>
+                                        <p class="text-sm text-gray-600">SĐT: 0123456789</p>
+                                        <p class="text-xs text-gray-500">Thẻ: Sinh viên</p>
+                                    </div>
+                                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Hoạt động</span>
+                                </div>
+                            </div>
+                            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-medium text-gray-800">Trần Thị Lan</h4>
+                                        <p class="text-sm text-gray-600">SĐT: 0987654321</p>
+                                        <p class="text-xs text-gray-500">Thẻ: Giáo viên</p>
+                                    </div>
+                                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Hoạt động</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Borrow/Return Tab -->
+        <div id="borrow" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Borrow Book Form -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <span class="bg-blue-100 p-2 rounded-lg mr-3">📤</span>
+                        Mượn Sách
+                    </h2>
+                    <form method="POST" action="/borrow/add/" class="space-y-4">
+                        {% csrf_token %}
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Mã độc giả</label>
+                            <input type="text" name="reader_id" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="Nhập mã thẻ độc giả...">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">ISBN sách</label>
+                            <input type="text" name="book_isbn" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="Nhập ISBN sách...">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Ngày mượn</label>
+                                <input type="date" name="borrow_date" required
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Ngày trả dự kiến</label>
+                                <input type="date" name="return_date" required
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Ghi chú</label>
+                            <textarea name="notes" rows="3"
+                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                      placeholder="Ghi chú thêm (nếu có)..."></textarea>
+                        </div>
+                        
+                        <button type="submit" 
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
+                            Xác nhận Mượn
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Return Book Form -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <span class="bg-green-100 p-2 rounded-lg mr-3">📥</span>
+                        Trả Sách
+                    </h2>
+                    <form method="POST" action="/borrow/return/" class="space-y-4">
+                        {% csrf_token %}
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Mã phiếu mượn</label>
+                            <input type="text" name="borrow_id" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                   placeholder="Nhập mã phiếu mượn...">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Ngày trả thực tế</label>
+                            <input type="date" name="actual_return_date" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tình trạng sách</label>
+                            <select name="book_condition" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                <option value="">Chọn tình trạng...</option>
+                                <option value="good">Tốt</option>
+                                <option value="normal">Bình thường</option>
+                                <option value="damaged">Hư hỏng nhẹ</option>
+                                <option value="lost">Mất sách</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Phí phạt (nếu có)</label>
+                            <input type="number" name="fine_amount" min="0" step="1000"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                   placeholder="0">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Ghi chú</label>
+                            <textarea name="return_notes" rows="3"
+                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                      placeholder="Ghi chú về tình trạng sách..."></textarea>
+                        </div>
+                        
+                        <button type="submit" 
+                                class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
+                            Xác nhận Trả
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Current Borrows -->
+            <div class="mt-8 bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="bg-yellow-100 p-2 rounded-lg mr-3">📋</span>
+                    Sách đang được mượn
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left font-medium text-gray-700">Mã phiếu</th>
+                                <th class="px-4 py-3 text-left font-medium text-gray-700">Độc giả</th>
+                                <th class="px-4 py-3 text-left font-medium text-gray-700">Sách</th>
+                                <th class="px-4 py-3 text-left font-medium text-gray-700">Ngày mượn</th>
+                                <th class="px-4 py-3 text-left font-medium text-gray-700">Hạn trả</th>
+                                <th class="px-4 py-3 text-left font-medium text-gray-700">Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3">#BRW001</td>
+                                <td class="px-4 py-3">Nguyễn Văn Nam</td>
+                                <td class="px-4 py-3">Lập trình Python</td>
+                                <td class="px-4 py-3">15/01/2024</td>
+                                <td class="px-4 py-3">29/01/2024</td>
+                                <td class="px-4 py-3">
+                                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Đúng hạn</span>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3">#BRW002</td>
+                                <td class="px-4 py-3">Trần Thị Lan</td>
+                                <td class="px-4 py-3">Lịch sử Việt Nam</td>
+                                <td class="px-4 py-3">10/01/2024</td>
+                                <td class="px-4 py-3">24/01/2024</td>
+                                <td class="px-4 py-3">
+                                    <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">Quá hạn</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div id="reports" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <!-- Statistics Cards -->
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-100">Tổng số sách</p>
+                            <p class="text-3xl font-bold">1,247</p>
+                        </div>
+                        <div class="bg-blue-400 p-3 rounded-lg">
+                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-green-100">Độc giả đăng ký</p>
+                            <p class="text-3xl font-bold">856</p>
+                        </div>
+                        <div class="bg-green-400 p-3 rounded-lg">
+                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl shadow-lg p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-yellow-100">Sách đang mượn</p>
+                            <p class="text-3xl font-bold">234</p>
+                        </div>
+                        <div class="bg-yellow-400 p-3 rounded-lg">
+                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+                                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Forms -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <span class="bg-indigo-100 p-2 rounded-lg mr-3">📊</span>
+                        Báo cáo Thống kê
+                    </h2>
+                    <form method="GET" action="/reports/statistics/" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Loại báo cáo</label>
+                            <select name="report_type" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                <option value="">Chọn loại báo cáo...</option>
+                                <option value="monthly">Báo cáo tháng</option>
+                                <option value="quarterly">Báo cáo quý</option>
+                                <option value="yearly">Báo cáo năm</option>
+                                <option value="custom">Tùy chỉnh</option>
+                            </select>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Từ ngày</label>
+                                <input type="date" name="start_date"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Đến ngày</label>
+                                <input type="date" name="end_date"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        
+                        <button type="submit" 
+                                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
+                            Tạo Báo cáo
+                        </button>
+                    </form>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <span class="bg-red-100 p-2 rounded-lg mr-3">⚠️</span>
+                        Báo cáo Quá hạn
+                    </h2>
+                    <form method="GET" action="/reports/overdue/" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Lọc theo</label>
+                            <select name="filter_type"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                                <option value="all">Tất cả sách quá hạn</option>
+                                <option value="1week">Quá hạn 1 tuần</option>
+                                <option value="2weeks">Quá hạn 2 tuần</option>
+                                <option value="1month">Quá hạn 1 tháng</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Sắp xếp theo</label>
+                            <select name="sort_by"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                                <option value="overdue_days">Số ngày quá hạn</option>
+                                <option value="reader_name">Tên độc giả</option>
+                                <option value="book_title">Tên sách</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" 
+                                class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
+                            Xem Danh sách
+                        </button>
+                    </form>
+
+                    <!-- Sample Overdue List -->
+                    <div class="mt-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Sách quá hạn gần đây</h3>
+                        <div class="space-y-2">
+                            <div class="border-l-4 border-red-500 bg-red-50 p-3 rounded">
+                                <p class="font-medium text-red-800">Trần Thị Lan</p>
+                                <p class="text-sm text-red-600">Lịch sử Việt Nam - Quá hạn 5 ngày</p>
+                            </div>
+                            <div class="border-l-4 border-orange-500 bg-orange-50 p-3 rounded">
+                                <p class="font-medium text-orange-800">Lê Văn Hùng</p>
+                                <p class="text-sm text-orange-600">Toán học cơ bản - Quá hạn 2 ngày</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Set current date
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('vi-VN');
+
+        // Tab functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all tab buttons
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        // Auto-fill today's date for borrow forms
+        const today = new Date().toISOString().split('T')[0];
+        const borrowDateInputs = document.querySelectorAll('input[name="borrow_date"], input[name="actual_return_date"]');
+        borrowDateInputs.forEach(input => {
+            if (!input.value) {
+                input.value = today;
+            }
+        });
+
+        // Auto-calculate return date (14 days from borrow date)
+        const borrowDateInput = document.querySelector('input[name="borrow_date"]');
+        const returnDateInput = document.querySelector('input[name="return_date"]');
+        
+        if (borrowDateInput && returnDateInput) {
+            borrowDateInput.addEventListener('change', function() {
+                const borrowDate = new Date(this.value);
+                const returnDate = new Date(borrowDate);
+                returnDate.setDate(returnDate.getDate() + 14);
+                returnDateInput.value = returnDate.toISOString().split('T')[0];
+            });
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97fce07fc76a045a',t:'MTc1Nzk4OTE0NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Ký - Thư Viện Trung Tâm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .hero-gradient { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .register-card { backdrop-filter: blur(10px); }
+        .step-indicator { transition: all 0.3s ease; }
+        .step-active { background: #10b981; color: white; }
+        .step-completed { background: #059669; color: white; }
+        .membership-card:hover { transform: translateY(-4px); }
+        .password-strength { height: 4px; transition: all 0.3s ease; }
+        .strength-weak { background: #ef4444; width: 25%; }
+        .strength-medium { background: #f59e0b; width: 50%; }
+        .strength-good { background: #22c55e; width: 75%; }
+        .strength-strong { background: #059669; width: 100%; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">📚</span>
+                    </div>
+                    <h1 class="text-xl font-bold text-gray-900">Thư Viện Trung Tâm</h1>
+                </div>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium">Trang chủ</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium">Danh mục</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium">Dịch vụ</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium">Liên hệ</a>
+                </nav>
+                <div class="flex items-center space-x-4">
+                    <button onclick="goToLogin()" class="text-indigo-600 hover:text-indigo-700 font-medium">Đăng nhập</button>
+                    <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                        Đăng ký
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="hero-gradient min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Progress Steps -->
+            <div class="mb-8">
+                <div class="flex items-center justify-center space-x-4">
+                    <div id="step1" class="step-indicator step-active w-10 h-10 rounded-full flex items-center justify-center font-semibold">1</div>
+                    <div class="w-16 h-1 bg-white bg-opacity-30 rounded"></div>
+                    <div id="step2" class="step-indicator w-10 h-10 rounded-full flex items-center justify-center font-semibold bg-white bg-opacity-30 text-gray-600">2</div>
+                    <div class="w-16 h-1 bg-white bg-opacity-30 rounded"></div>
+                    <div id="step3" class="step-indicator w-10 h-10 rounded-full flex items-center justify-center font-semibold bg-white bg-opacity-30 text-gray-600">3</div>
+                </div>
+                <div class="flex justify-between mt-2 text-white text-sm">
+                    <span class="w-20 text-center">Thông tin</span>
+                    <span class="w-20 text-center">Gói thành viên</span>
+                    <span class="w-20 text-center">Xác nhận</span>
+                </div>
+            </div>
+
+            <!-- Registration Card -->
+            <div class="register-card bg-white bg-opacity-95 backdrop-blur-sm rounded-2xl shadow-2xl p-8">
+                <!-- Step 1: Personal Information -->
+                <div id="stepContent1" class="step-content">
+                    <div class="text-center mb-8">
+                        <div class="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="text-white text-3xl">👤</span>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Thông tin cá nhân</h2>
+                        <p class="text-gray-600">Điền thông tin để tạo tài khoản thư viện</p>
+                    </div>
+
+                    <form id="personalInfoForm" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Họ và tên đệm *</label>
+                                <input type="text" id="firstName" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Nguyễn Văn">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tên *</label>
+                                <input type="text" id="lastName" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="An">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                                <input type="email" id="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="example@email.com">
+                                <p class="text-xs text-gray-500 mt-1">Email sẽ được dùng để đăng nhập</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Số điện thoại *</label>
+                                <input type="tel" id="phone" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="0123456789">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Ngày sinh</label>
+                                <input type="date" id="birthDate" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Giới tính</label>
+                                <select id="gender" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    <option value="">Chọn giới tính</option>
+                                    <option value="male">Nam</option>
+                                    <option value="female">Nữ</option>
+                                    <option value="other">Khác</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Địa chỉ</label>
+                            <textarea id="address" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Nhập địa chỉ đầy đủ"></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Nghề nghiệp *</label>
+                                <select id="occupation" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    <option value="">Chọn nghề nghiệp</option>
+                                    <option value="student">Sinh viên</option>
+                                    <option value="teacher">Giáo viên</option>
+                                    <option value="researcher">Nhà nghiên cứu</option>
+                                    <option value="office">Nhân viên văn phòng</option>
+                                    <option value="freelancer">Freelancer</option>
+                                    <option value="retired">Đã nghỉ hưu</option>
+                                    <option value="other">Khác</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Trường/Cơ quan</label>
+                                <input type="text" id="organization" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Tên trường/cơ quan">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Mật khẩu *</label>
+                            <div class="relative">
+                                <input type="password" id="password" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 pr-12" placeholder="Nhập mật khẩu">
+                                <button type="button" onclick="togglePassword('password')" class="absolute right-3 top-3 text-gray-400 hover:text-gray-600">
+                                    <span id="passwordToggle">👁️</span>
+                                </button>
+                            </div>
+                            <div class="mt-2">
+                                <div class="password-strength rounded" id="passwordStrength"></div>
+                                <p class="text-xs text-gray-500 mt-1" id="passwordStrengthText">Mật khẩu phải có ít nhất 8 ký tự</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Xác nhận mật khẩu *</label>
+                            <input type="password" id="confirmPassword" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Nhập lại mật khẩu">
+                            <p class="text-xs text-red-500 mt-1 hidden" id="passwordMismatch">Mật khẩu không khớp</p>
+                        </div>
+
+                        <button type="button" onclick="nextStep(2)" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
+                            Tiếp tục
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Step 2: Membership Selection -->
+                <div id="stepContent2" class="step-content hidden">
+                    <div class="text-center mb-8">
+                        <div class="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="text-white text-3xl">💳</span>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Chọn gói thành viên</h2>
+                        <p class="text-gray-600">Lựa chọn gói thành viên phù hợp với nhu cầu của bạn</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="membership-card bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 border-2 border-transparent cursor-pointer transition-all duration-300" onclick="selectMembership('basic')">
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-gray-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span class="text-white text-2xl">🆓</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">Cơ bản</h3>
+                                <div class="text-3xl font-bold text-gray-600 mb-4">Miễn phí</div>
+                                <ul class="text-left space-y-2 text-sm text-gray-600 mb-6">
+                                    <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>Mượn 3 cuốn/lần</li>
+                                    <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>Thời hạn 14 ngày</li>
+                                    <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>Thư viện số cơ bản</li>
+                                    <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>Không gian chung</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="membership-card bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border-2 border-blue-500 cursor-pointer transition-all duration-300 relative" onclick="selectMembership('standard')">
+                            <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                                <span class="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-medium">Phổ biến</span>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span class="text-white text-2xl">⭐</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">Tiêu chuẩn</h3>
+                                <div class="text-3xl font-bold text-blue-600 mb-4">200,000₫<span class="text-sm text-gray-500">/năm</span></div>
+                                <ul class="text-left space-y-2 text-sm text-gray-600 mb-6">
+                                    <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>Mượn 10 cuốn/lần</li>
+                                    <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>Thời hạn 30 ngày</li>
+                                    <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>Thư viện số đầy đủ</li>
+                                    <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>Đặt phòng học nhóm</li>
+                                    <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>Tư vấn nghiên cứu</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="membership-card bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border-2 border-transparent cursor-pointer transition-all duration-300" onclick="selectMembership('premium')">
+                            <div class="text-center">
+                                <div class="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span class="text-white text-2xl">👑</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">Cao cấp</h3>
+                                <div class="text-3xl font-bold text-purple-600 mb-4">500,000₫<span class="text-sm text-gray-500">/năm</span></div>
+                                <ul class="text-left space-y-2 text-sm text-gray-600 mb-6">
+                                    <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>Mượn không giới hạn</li>
+                                    <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>Thời hạn 60 ngày</li>
+                                    <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>Thư viện số VIP</li>
+                                    <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>Phòng học riêng</li>
+                                    <li class="flex items-center"><span class="text-green-500 mr-2">✓</span>Hỗ trợ 1-1</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <button type="button" onclick="prevStep(1)" class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg hover:bg-gray-300 transition-colors">
+                            Quay lại
+                        </button>
+                        <button type="button" onclick="nextStep(3)" class="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
+                            Tiếp tục
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Confirmation -->
+                <div id="stepContent3" class="step-content hidden">
+                    <div class="text-center mb-8">
+                        <div class="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="text-white text-3xl">✅</span>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-2">Xác nhận thông tin</h2>
+                        <p class="text-gray-600">Kiểm tra lại thông tin trước khi hoàn tất đăng ký</p>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-xl p-6 mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Thông tin cá nhân</h3>
+                        <div id="confirmationInfo" class="space-y-2 text-gray-600">
+                            <!-- Information will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-xl p-6 mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Gói thành viên đã chọn</h3>
+                        <div id="selectedMembershipInfo" class="text-gray-600">
+                            <!-- Membership info will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
+                        <h3 class="text-lg font-semibold text-blue-800 mb-2">Điều khoản và điều kiện</h3>
+                        <div class="text-sm text-blue-700 space-y-2">
+                            <p>• Thông tin cá nhân sẽ được bảo mật theo chính sách của thư viện</p>
+                            <p>• Thẻ thành viên có hiệu lực trong 1 năm kể từ ngày đăng ký</p>
+                            <p>• Phí thành viên không được hoàn lại sau khi đã thanh toán</p>
+                            <p>• Thành viên có trách nhiệm tuân thủ nội quy thư viện</p>
+                        </div>
+                        <div class="flex items-center mt-4">
+                            <input type="checkbox" id="agreeTerms" required class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                            <label for="agreeTerms" class="ml-2 block text-sm text-blue-700">
+                                Tôi đồng ý với các điều khoản và điều kiện trên
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <button type="button" onclick="prevStep(2)" class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg hover:bg-gray-300 transition-colors">
+                            Quay lại
+                        </button>
+                        <button type="button" onclick="completeRegistration()" class="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
+                            Hoàn tất đăng ký
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alternative Registration Options -->
+            <div class="mt-8 bg-white bg-opacity-90 backdrop-blur-sm rounded-xl p-6">
+                <div class="text-center mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Hoặc đăng ký nhanh bằng</h3>
+                    <p class="text-gray-600 text-sm">Sử dụng tài khoản mạng xã hội để đăng ký nhanh chóng</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button onclick="registerWithGoogle()" class="w-full inline-flex justify-center items-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Đăng ký bằng Google
+                    </button>
+
+                    <button onclick="registerWithFacebook()" class="w-full inline-flex justify-center items-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="w-5 h-5 mr-3" fill="#1877F2" viewBox="0 0 24 24">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                        Đăng ký bằng Facebook
+                    </button>
+                </div>
+
+                <div class="text-center mt-6">
+                    <p class="text-sm text-gray-600">
+                        Đã có tài khoản? 
+                        <button onclick="goToLogin()" class="text-green-600 hover:text-green-500 font-medium">
+                            Đăng nhập ngay
+                        </button>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let selectedMembership = 'standard'; // Default selection
+        let registrationData = {};
+
+        // Toggle password visibility
+        function togglePassword(inputId) {
+            const passwordInput = document.getElementById(inputId);
+            const toggleIcon = document.getElementById('passwordToggle');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.textContent = '👁️';
+            }
+        }
+
+        // Check password strength
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strengthBar = document.getElementById('passwordStrength');
+            const strengthText = document.getElementById('passwordStrengthText');
+            
+            let strength = 0;
+            let text = '';
+            
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            
+            strengthBar.className = 'password-strength rounded';
+            
+            switch (strength) {
+                case 0:
+                case 1:
+                    strengthBar.classList.add('strength-weak');
+                    text = 'Mật khẩu yếu';
+                    break;
+                case 2:
+                    strengthBar.classList.add('strength-medium');
+                    text = 'Mật khẩu trung bình';
+                    break;
+                case 3:
+                case 4:
+                    strengthBar.classList.add('strength-good');
+                    text = 'Mật khẩu tốt';
+                    break;
+                case 5:
+                    strengthBar.classList.add('strength-strong');
+                    text = 'Mật khẩu mạnh';
+                    break;
+            }
+            
+            strengthText.textContent = text;
+        });
+
+        // Check password confirmation
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = this.value;
+            const mismatchText = document.getElementById('passwordMismatch');
+            
+            if (confirmPassword && password !== confirmPassword) {
+                mismatchText.classList.remove('hidden');
+                this.classList.add('border-red-500');
+            } else {
+                mismatchText.classList.add('hidden');
+                this.classList.remove('border-red-500');
+            }
+        });
+
+        // Step navigation
+        function nextStep(step) {
+            if (step === 2) {
+                // Validate step 1
+                if (!validatePersonalInfo()) return;
+                collectPersonalInfo();
+            } else if (step === 3) {
+                // Validate step 2
+                if (!selectedMembership) {
+                    alert('Vui lòng chọn gói thành viên!');
+                    return;
+                }
+                populateConfirmation();
+            }
+            
+            showStep(step);
+        }
+
+        function prevStep(step) {
+            showStep(step);
+        }
+
+        function showStep(step) {
+            // Hide all steps
+            for (let i = 1; i <= 3; i++) {
+                document.getElementById(`stepContent${i}`).classList.add('hidden');
+                const stepIndicator = document.getElementById(`step${i}`);
+                stepIndicator.classList.remove('step-active', 'step-completed');
+                stepIndicator.classList.add('bg-white', 'bg-opacity-30', 'text-gray-600');
+            }
+            
+            // Show current step
+            document.getElementById(`stepContent${step}`).classList.remove('hidden');
+            
+            // Update step indicators
+            for (let i = 1; i <= 3; i++) {
+                const stepIndicator = document.getElementById(`step${i}`);
+                if (i < step) {
+                    stepIndicator.classList.add('step-completed');
+                    stepIndicator.classList.remove('bg-white', 'bg-opacity-30', 'text-gray-600');
+                } else if (i === step) {
+                    stepIndicator.classList.add('step-active');
+                    stepIndicator.classList.remove('bg-white', 'bg-opacity-30', 'text-gray-600');
+                }
+            }
+            
+            currentStep = step;
+        }
+
+        // Validate personal information
+        function validatePersonalInfo() {
+            const required = ['firstName', 'lastName', 'email', 'phone', 'occupation', 'password', 'confirmPassword'];
+            
+            for (let field of required) {
+                const element = document.getElementById(field);
+                if (!element.value.trim()) {
+                    alert(`Vui lòng điền ${element.previousElementSibling.textContent}`);
+                    element.focus();
+                    return false;
+                }
+            }
+            
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                alert('Mật khẩu xác nhận không khớp!');
+                return false;
+            }
+            
+            if (password.length < 8) {
+                alert('Mật khẩu phải có ít nhất 8 ký tự!');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Collect personal information
+        function collectPersonalInfo() {
+            registrationData = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                birthDate: document.getElementById('birthDate').value,
+                gender: document.getElementById('gender').value,
+                address: document.getElementById('address').value,
+                occupation: document.getElementById('occupation').value,
+                organization: document.getElementById('organization').value,
+                password: document.getElementById('password').value
+            };
+        }
+
+        // Select membership
+        function selectMembership(type) {
+            selectedMembership = type;
+            
+            // Remove selection from all cards
+            document.querySelectorAll('.membership-card').forEach(card => {
+                card.classList.remove('border-green-500', 'bg-green-50');
+            });
+            
+            // Add selection to clicked card
+            event.currentTarget.classList.add('border-green-500', 'bg-green-50');
+        }
+
+        // Populate confirmation
+        function populateConfirmation() {
+            const confirmationInfo = document.getElementById('confirmationInfo');
+            const membershipInfo = document.getElementById('selectedMembershipInfo');
+            
+            const genderText = {
+                'male': 'Nam',
+                'female': 'Nữ',
+                'other': 'Khác'
+            };
+            
+            const occupationText = {
+                'student': 'Sinh viên',
+                'teacher': 'Giáo viên',
+                'researcher': 'Nhà nghiên cứu',
+                'office': 'Nhân viên văn phòng',
+                'freelancer': 'Freelancer',
+                'retired': 'Đã nghỉ hưu',
+                'other': 'Khác'
+            };
+            
+            confirmationInfo.innerHTML = `
+                <p><strong>Họ tên:</strong> ${registrationData.firstName} ${registrationData.lastName}</p>
+                <p><strong>Email:</strong> ${registrationData.email}</p>
+                <p><strong>Số điện thoại:</strong> ${registrationData.phone}</p>
+                ${registrationData.birthDate ? `<p><strong>Ngày sinh:</strong> ${registrationData.birthDate}</p>` : ''}
+                ${registrationData.gender ? `<p><strong>Giới tính:</strong> ${genderText[registrationData.gender] || registrationData.gender}</p>` : ''}
+                ${registrationData.address ? `<p><strong>Địa chỉ:</strong> ${registrationData.address}</p>` : ''}
+                <p><strong>Nghề nghiệp:</strong> ${occupationText[registrationData.occupation] || registrationData.occupation}</p>
+                ${registrationData.organization ? `<p><strong>Trường/Cơ quan:</strong> ${registrationData.organization}</p>` : ''}
+            `;
+            
+            const membershipDetails = {
+                'basic': { name: 'Cơ bản', price: 'Miễn phí', icon: '🆓' },
+                'standard': { name: 'Tiêu chuẩn', price: '200,000₫/năm', icon: '⭐' },
+                'premium': { name: 'Cao cấp', price: '500,000₫/năm', icon: '👑' }
+            };
+            
+            const membership = membershipDetails[selectedMembership];
+            membershipInfo.innerHTML = `
+                <div class="flex items-center">
+                    <span class="text-2xl mr-3">${membership.icon}</span>
+                    <div>
+                        <p class="font-semibold">${membership.name}</p>
+                        <p class="text-sm text-gray-500">${membership.price}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Complete registration
+        function completeRegistration() {
+            const agreeTerms = document.getElementById('agreeTerms').checked;
+            
+            if (!agreeTerms) {
+                alert('Vui lòng đồng ý với điều khoản và điều kiện!');
+                return;
+            }
+            
+            // Simulate registration process
+            const membershipDetails = {
+                'basic': 'Cơ bản (Miễn phí)',
+                'standard': 'Tiêu chuẩn (200,000₫/năm)',
+                'premium': 'Cao cấp (500,000₫/năm)'
+            };
+            
+            alert(`Đăng ký thành công!\n\nChào mừng ${registrationData.firstName} ${registrationData.lastName}!\nGói thành viên: ${membershipDetails[selectedMembership]}\n\nVui lòng kiểm tra email ${registrationData.email} để xác thực tài khoản và hoàn tất thủ tục.`);
+            
+            // In a real app, redirect to login or dashboard
+        }
+
+        // Social registration
+        function registerWithGoogle() {
+            alert('Đang chuyển hướng đến Google để đăng ký...');
+        }
+
+        function registerWithFacebook() {
+            alert('Đang chuyển hướng đến Facebook để đăng ký...');
+        }
+
+        // Navigation
+        function goToLogin() {
+            alert('Chuyển đến trang đăng nhập...');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Pre-select standard membership
+            selectMembership('standard');
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97e807f921e004b5',t:'MTc1Nzc3MDU2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

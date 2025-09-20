@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông Tin Cá Nhân - Thư Viện Trung Tâm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap');
+        body { font-family: 'Google Sans', 'Roboto', sans-serif; }
+        
+        .profile-card {
+            backdrop-filter: blur(10px);
+            border: 1px solid #e5e7eb;
+        }
+        
+        .edit-mode {
+            border-color: #3b82f6;
+            background-color: #f8fafc;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .success-animation {
+            animation: successPulse 0.6s ease-in-out;
+        }
+        
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .profile-input {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .profile-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+        
+        .tab-active {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+        
+        .tab-inactive {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+        
+        .tab-inactive:hover {
+            background: #e5e7eb;
+            color: #374151;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">📚</span>
+                    </div>
+                    <h1 class="text-xl font-bold text-gray-900">Thư Viện Trung Tâm</h1>
+                </div>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium">Trang chủ</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium">Danh mục</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium">Dịch vụ</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium">Liên hệ</a>
+                </nav>
+                <div class="flex items-center space-x-4">
+                    <!-- User Menu -->
+                    <div class="relative">
+                        <button onclick="toggleUserMenu()" class="flex items-center space-x-3 bg-gray-100 hover:bg-gray-200 rounded-lg px-3 py-2 transition-colors">
+                            <div class="w-8 h-8 bg-gradient-to-br from-blue-400 to-red-500 rounded-full flex items-center justify-center">
+                                <span class="text-white text-sm font-bold">NVM</span>
+                            </div>
+                            <div class="hidden md:block text-left">
+                                <div class="text-sm font-medium text-gray-900">Nguyễn Văn Minh</div>
+                                <div class="text-xs text-gray-500">Thành viên</div>
+                            </div>
+                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                            <div class="p-4 border-b border-gray-100">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-red-500 rounded-full flex items-center justify-center">
+                                        <span class="text-white text-lg font-bold">NVM</span>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-900">Nguyễn Văn Minh</div>
+                                        <div class="text-sm text-gray-500">nguyenvanminh@gmail.com</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="py-2">
+                                <a href="#" class="flex items-center px-4 py-2 text-sm text-blue-600 bg-blue-50 font-medium">
+                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
+                                    Thông tin cá nhân
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.168 18.477 18.582 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                    </svg>
+                                    Sách của tôi
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                    </svg>
+                                    Lịch sử mượn
+                                </a>
+                            </div>
+                            
+                            <div class="border-t border-gray-100 py-2">
+                                <button onclick="logout()" class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                    </svg>
+                                    Đăng xuất
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-8" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="#" class="text-gray-700 hover:text-blue-600">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                        </svg>
+                        Trang chủ
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="ml-1 text-blue-600 font-medium">Thông tin cá nhân</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Thông tin cá nhân</h1>
+            <p class="text-gray-600">Quản lý thông tin tài khoản và cài đặt của bạn</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="mb-8">
+            <div class="border-b border-gray-200">
+                <nav class="-mb-px flex space-x-8">
+                    <button onclick="switchTab('profile')" id="profileTab" class="tab-active py-2 px-4 border-b-2 border-transparent font-medium text-sm rounded-t-lg transition-all">
+                        👤 Thông tin chung
+                    </button>
+                    <button onclick="switchTab('security')" id="securityTab" class="tab-inactive py-2 px-4 border-b-2 border-transparent font-medium text-sm rounded-t-lg transition-all">
+                        🔒 Bảo mật
+                    </button>
+                    <button onclick="switchTab('preferences')" id="preferencesTab" class="tab-inactive py-2 px-4 border-b-2 border-transparent font-medium text-sm rounded-t-lg transition-all">
+                        ⚙️ Tùy chọn
+                    </button>
+                    <button onclick="switchTab('activity')" id="activityTab" class="tab-inactive py-2 px-4 border-b-2 border-transparent font-medium text-sm rounded-t-lg transition-all">
+                        📊 Hoạt động
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Profile Tab Content -->
+        <div id="profileContent" class="fade-in">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Profile Picture Section -->
+                <div class="lg:col-span-1">
+                    <div class="profile-card bg-white rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-6">Ảnh đại diện</h3>
+                        
+                        <div class="text-center">
+                            <div class="w-32 h-32 bg-gradient-to-br from-blue-400 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <span class="text-white text-4xl font-bold">NVM</span>
+                            </div>
+                            
+                            <h4 class="text-xl font-semibold text-gray-900 mb-2">Nguyễn Văn Minh</h4>
+                            <p class="text-gray-600 mb-4">Thành viên từ 2023</p>
+                            
+                            <div class="space-y-3">
+                                <button onclick="changeAvatar()" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                                    📷 Thay đổi ảnh
+                                </button>
+                                <button onclick="removeAvatar()" class="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors">
+                                    🗑️ Xóa ảnh
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Stats -->
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <div class="grid grid-cols-2 gap-4 text-center">
+                                <div>
+                                    <div class="text-2xl font-bold text-blue-600">32</div>
+                                    <div class="text-sm text-gray-600">Sách đã mượn</div>
+                                </div>
+                                <div>
+                                    <div class="text-2xl font-bold text-green-600">3</div>
+                                    <div class="text-sm text-gray-600">Đang mượn</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personal Information Section -->
+                <div class="lg:col-span-2">
+                    <div class="profile-card bg-white rounded-xl shadow-sm p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-semibold text-gray-900">Thông tin cá nhân</h3>
+                            <button onclick="toggleEdit()" id="editBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                                ✏️ Chỉnh sửa
+                            </button>
+                        </div>
+
+                        <form id="profileForm" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Họ và tên -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Họ và tên</label>
+                                    <input type="text" id="fullName" value="Nguyễn Văn Minh" class="profile-input w-full px-4 py-3 text-gray-900" readonly>
+                                </div>
+
+                                <!-- Email -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                    <input type="email" id="email" value="nguyenvanminh@gmail.com" class="profile-input w-full px-4 py-3 text-gray-900" readonly>
+                                </div>
+
+                                <!-- Số điện thoại -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
+                                    <input type="tel" id="phone" value="0987654321" class="profile-input w-full px-4 py-3 text-gray-900" readonly>
+                                </div>
+
+                                <!-- Ngày sinh -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Ngày sinh</label>
+                                    <input type="date" id="birthDate" value="1995-05-15" class="profile-input w-full px-4 py-3 text-gray-900" readonly>
+                                </div>
+
+                                <!-- Giới tính -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Giới tính</label>
+                                    <select id="gender" class="profile-input w-full px-4 py-3 text-gray-900" disabled>
+                                        <option value="male" selected>Nam</option>
+                                        <option value="female">Nữ</option>
+                                        <option value="other">Khác</option>
+                                    </select>
+                                </div>
+
+                                <!-- Nghề nghiệp -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nghề nghiệp</label>
+                                    <input type="text" id="occupation" value="Kỹ sư phần mềm" class="profile-input w-full px-4 py-3 text-gray-900" readonly>
+                                </div>
+                            </div>
+
+                            <!-- Địa chỉ -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Địa chỉ</label>
+                                <textarea id="address" rows="3" class="profile-input w-full px-4 py-3 text-gray-900" readonly>123 Đường ABC, Phường XYZ, Quận 1, TP.HCM</textarea>
+                            </div>
+
+                            <!-- Sở thích đọc sách -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Sở thích đọc sách</label>
+                                <textarea id="interests" rows="3" class="profile-input w-full px-4 py-3 text-gray-900" readonly>Khoa học viễn tưởng, Lịch sử, Công nghệ, Triết học</textarea>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div id="actionButtons" class="hidden flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                                <button type="button" onclick="cancelEdit()" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                                    Hủy
+                                </button>
+                                <button type="button" onclick="saveProfile()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                    💾 Lưu thay đổi
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Tab Content -->
+        <div id="securityContent" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Password Section -->
+                <div class="profile-card bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6">Đổi mật khẩu</h3>
+                    
+                    <form class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Mật khẩu hiện tại</label>
+                            <input type="password" class="profile-input w-full px-4 py-3" placeholder="Nhập mật khẩu hiện tại">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Mật khẩu mới</label>
+                            <input type="password" class="profile-input w-full px-4 py-3" placeholder="Nhập mật khẩu mới">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Xác nhận mật khẩu mới</label>
+                            <input type="password" class="profile-input w-full px-4 py-3" placeholder="Nhập lại mật khẩu mới">
+                        </div>
+                        <button type="button" onclick="changePassword()" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                            🔐 Đổi mật khẩu
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Two-Factor Authentication -->
+                <div class="profile-card bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6">Xác thực hai yếu tố</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-green-50 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                                    <span class="text-green-600">✅</span>
+                                </div>
+                                <div>
+                                    <div class="font-medium text-gray-900">Google Authenticator</div>
+                                    <div class="text-sm text-gray-600">Đã kích hoạt</div>
+                                </div>
+                            </div>
+                            <button onclick="disable2FA()" class="text-red-600 hover:text-red-700 font-medium">Tắt</button>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                                    <span class="text-gray-600">📱</span>
+                                </div>
+                                <div>
+                                    <div class="font-medium text-gray-900">SMS</div>
+                                    <div class="text-sm text-gray-600">Chưa kích hoạt</div>
+                                </div>
+                            </div>
+                            <button onclick="enableSMS2FA()" class="text-blue-600 hover:text-blue-700 font-medium">Bật</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Login Sessions -->
+            <div class="mt-8 profile-card bg-white rounded-xl shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">Phiên đăng nhập</h3>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 border border-green-200 bg-green-50 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-green-600">💻</span>
+                            </div>
+                            <div>
+                                <div class="font-medium text-gray-900">Chrome trên Windows</div>
+                                <div class="text-sm text-gray-600">Hiện tại • TP.HCM, Việt Nam</div>
+                            </div>
+                        </div>
+                        <span class="text-green-600 text-sm font-medium">Đang hoạt động</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-gray-600">📱</span>
+                            </div>
+                            <div>
+                                <div class="font-medium text-gray-900">Safari trên iPhone</div>
+                                <div class="text-sm text-gray-600">2 giờ trước • TP.HCM, Việt Nam</div>
+                            </div>
+                        </div>
+                        <button onclick="terminateSession()" class="text-red-600 hover:text-red-700 font-medium">Đăng xuất</button>
+                    </div>
+                </div>
+                
+                <button onclick="terminateAllSessions()" class="mt-4 w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition-colors">
+                    🚪 Đăng xuất tất cả thiết bị
+                </button>
+            </div>
+        </div>
+
+        <!-- Preferences Tab Content -->
+        <div id="preferencesContent" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Notification Settings -->
+                <div class="profile-card bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6">Thông báo</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="font-medium text-gray-900">Email thông báo</div>
+                                <div class="text-sm text-gray-600">Nhận thông báo qua email</div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="font-medium text-gray-900">Nhắc nhở trả sách</div>
+                                <div class="text-sm text-gray-600">Nhắc nhở trước hạn trả sách</div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="font-medium text-gray-900">Sách mới</div>
+                                <div class="text-sm text-gray-600">Thông báo về sách mới</div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Privacy Settings -->
+                <div class="profile-card bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6">Quyền riêng tư</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="font-medium text-gray-900">Hiển thị hoạt động</div>
+                                <div class="text-sm text-gray-600">Cho phép người khác xem hoạt động đọc</div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="font-medium text-gray-900">Chia sẻ dữ liệu</div>
+                                <div class="text-sm text-gray-600">Chia sẻ dữ liệu để cải thiện dịch vụ</div>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Language & Display -->
+            <div class="mt-8 profile-card bg-white rounded-xl shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">Ngôn ngữ & Hiển thị</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Ngôn ngữ</label>
+                        <select class="profile-input w-full px-4 py-3">
+                            <option value="vi" selected>Tiếng Việt</option>
+                            <option value="en">English</option>
+                            <option value="zh">中文</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Múi giờ</label>
+                        <select class="profile-input w-full px-4 py-3">
+                            <option value="Asia/Ho_Chi_Minh" selected>GMT+7 (Việt Nam)</option>
+                            <option value="Asia/Tokyo">GMT+9 (Nhật Bản)</option>
+                            <option value="America/New_York">GMT-5 (New York)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button onclick="savePreferences()" class="mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                    💾 Lưu cài đặt
+                </button>
+            </div>
+        </div>
+
+        <!-- Activity Tab Content -->
+        <div id="activityContent" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Activity Stats -->
+                <div class="lg:col-span-1 space-y-6">
+                    <div class="profile-card bg-white rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Thống kê hoạt động</h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Sách đã đọc</span>
+                                <span class="font-semibold text-blue-600">32</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Đang mượn</span>
+                                <span class="font-semibold text-green-600">3</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Quá hạn</span>
+                                <span class="font-semibold text-red-600">0</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-600">Đánh giá</span>
+                                <span class="font-semibold text-purple-600">28</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-card bg-white rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Thể loại yêu thích</h3>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 bg-blue-500 rounded mr-3"></div>
+                                <span class="text-sm text-gray-600 flex-1">Khoa học viễn tưởng</span>
+                                <span class="text-sm font-medium">40%</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 bg-green-500 rounded mr-3"></div>
+                                <span class="text-sm text-gray-600 flex-1">Lịch sử</span>
+                                <span class="text-sm font-medium">25%</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 bg-purple-500 rounded mr-3"></div>
+                                <span class="text-sm text-gray-600 flex-1">Công nghệ</span>
+                                <span class="text-sm font-medium">20%</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 bg-yellow-500 rounded mr-3"></div>
+                                <span class="text-sm text-gray-600 flex-1">Triết học</span>
+                                <span class="text-sm font-medium">15%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="lg:col-span-2">
+                    <div class="profile-card bg-white rounded-xl shadow-sm p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-6">Hoạt động gần đây</h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-4 p-4 bg-blue-50 rounded-lg">
+                                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <span class="text-blue-600">📖</span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="font-medium text-gray-900">Mượn sách "Sapiens"</div>
+                                    <div class="text-sm text-gray-600">Hôm nay, 14:30</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-4 p-4 bg-green-50 rounded-lg">
+                                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                    <span class="text-green-600">✅</span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="font-medium text-gray-900">Trả sách "Dune"</div>
+                                    <div class="text-sm text-gray-600">Hôm qua, 16:45</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-4 p-4 bg-purple-50 rounded-lg">
+                                <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                                    <span class="text-purple-600">⭐</span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="font-medium text-gray-900">Đánh giá "The Martian" - 5 sao</div>
+                                    <div class="text-sm text-gray-600">2 ngày trước, 20:15</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-4 p-4 bg-yellow-50 rounded-lg">
+                                <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                                    <span class="text-yellow-600">🔖</span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="font-medium text-gray-900">Thêm "1984" vào danh sách yêu thích</div>
+                                    <div class="text-sm text-gray-600">3 ngày trước, 11:20</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
+                                <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                                    <span class="text-gray-600">📚</span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="font-medium text-gray-900">Mượn sách "Clean Code"</div>
+                                    <div class="text-sm text-gray-600">1 tuần trước, 09:30</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button onclick="loadMoreActivity()" class="mt-6 w-full bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 transition-colors">
+                            📜 Xem thêm hoạt động
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 max-w-md mx-4 success-animation">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-green-600 text-2xl">✅</span>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">Thành công!</h3>
+                <p id="successMessage" class="text-gray-600 mb-6">Thông tin đã được cập nhật thành công.</p>
+                <button onclick="closeSuccessModal()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isEditing = false;
+        let currentTab = 'profile';
+
+        function switchTab(tabName) {
+            // Hide all content
+            document.getElementById('profileContent').classList.add('hidden');
+            document.getElementById('securityContent').classList.add('hidden');
+            document.getElementById('preferencesContent').classList.add('hidden');
+            document.getElementById('activityContent').classList.add('hidden');
+
+            // Reset all tabs
+            document.getElementById('profileTab').className = 'tab-inactive py-2 px-4 border-b-2 border-transparent font-medium text-sm rounded-t-lg transition-all';
+            document.getElementById('securityTab').className = 'tab-inactive py-2 px-4 border-b-2 border-transparent font-medium text-sm rounded-t-lg transition-all';
+            document.getElementById('preferencesTab').className = 'tab-inactive py-2 px-4 border-b-2 border-transparent font-medium text-sm rounded-t-lg transition-all';
+            document.getElementById('activityTab').className = 'tab-inactive py-2 px-4 border-b-2 border-transparent font-medium text-sm rounded-t-lg transition-all';
+
+            // Show selected content and activate tab
+            document.getElementById(tabName + 'Content').classList.remove('hidden');
+            document.getElementById(tabName + 'Tab').className = 'tab-active py-2 px-4 border-b-2 border-transparent font-medium text-sm rounded-t-lg transition-all';
+            
+            currentTab = tabName;
+        }
+
+        function toggleEdit() {
+            isEditing = !isEditing;
+            const inputs = document.querySelectorAll('#profileForm input, #profileForm textarea, #profileForm select');
+            const editBtn = document.getElementById('editBtn');
+            const actionButtons = document.getElementById('actionButtons');
+
+            if (isEditing) {
+                inputs.forEach(input => {
+                    input.removeAttribute('readonly');
+                    input.removeAttribute('disabled');
+                    input.classList.add('edit-mode');
+                });
+                editBtn.innerHTML = '❌ Hủy chỉnh sửa';
+                editBtn.className = 'bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors';
+                actionButtons.classList.remove('hidden');
+            } else {
+                inputs.forEach(input => {
+                    input.setAttribute('readonly', true);
+                    if (input.tagName === 'SELECT') {
+                        input.setAttribute('disabled', true);
+                    }
+                    input.classList.remove('edit-mode');
+                });
+                editBtn.innerHTML = '✏️ Chỉnh sửa';
+                editBtn.className = 'bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors';
+                actionButtons.classList.add('hidden');
+            }
+        }
+
+        function cancelEdit() {
+            // Reset form values to original
+            document.getElementById('fullName').value = 'Nguyễn Văn Minh';
+            document.getElementById('email').value = 'nguyenvanminh@gmail.com';
+            document.getElementById('phone').value = '0987654321';
+            document.getElementById('birthDate').value = '1995-05-15';
+            document.getElementById('gender').value = 'male';
+            document.getElementById('occupation').value = 'Kỹ sư phần mềm';
+            document.getElementById('address').value = '123 Đường ABC, Phường XYZ, Quận 1, TP.HCM';
+            document.getElementById('interests').value = 'Khoa học viễn tưởng, Lịch sử, Công nghệ, Triết học';
+            
+            toggleEdit();
+        }
+
+        function saveProfile() {
+            // Simulate saving
+            setTimeout(() => {
+                showSuccessModal('Thông tin cá nhân đã được cập nhật thành công!');
+                toggleEdit();
+            }, 500);
+        }
+
+        function changeAvatar() {
+            showSuccessModal('Tính năng thay đổi ảnh đại diện sẽ được cập nhật sớm!');
+        }
+
+        function removeAvatar() {
+            showSuccessModal('Ảnh đại diện đã được xóa thành công!');
+        }
+
+        function changePassword() {
+            showSuccessModal('Mật khẩu đã được thay đổi thành công!');
+        }
+
+        function disable2FA() {
+            showSuccessModal('Xác thực hai yếu tố đã được tắt!');
+        }
+
+        function enableSMS2FA() {
+            showSuccessModal('Xác thực SMS đã được kích hoạt!');
+        }
+
+        function terminateSession() {
+            showSuccessModal('Phiên đăng nhập đã được kết thúc!');
+        }
+
+        function terminateAllSessions() {
+            showSuccessModal('Tất cả phiên đăng nhập đã được kết thúc!');
+        }
+
+        function savePreferences() {
+            showSuccessModal('Cài đặt tùy chọn đã được lưu thành công!');
+        }
+
+        function loadMoreActivity() {
+            showSuccessModal('Đang tải thêm hoạt động...');
+        }
+
+        function showSuccessModal(message) {
+            document.getElementById('successMessage').textContent = message;
+            document.getElementById('successModal').classList.remove('hidden');
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.add('hidden');
+        }
+
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        function logout() {
+            alert('Đăng xuất thành công!');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const userMenu = document.querySelector('[onclick="toggleUserMenu()"]');
+            const dropdown = document.getElementById('userDropdown');
+            
+            if (userMenu && dropdown && !userMenu.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('successModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSuccessModal();
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97e82eca72440945',t:'MTc1Nzc3MjE1MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sách Của Tôi - Thư Viện Trung Tâm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap');
+        body { font-family: 'Google Sans', 'Roboto', sans-serif; }
+        
+        .book-card {
+            backdrop-filter: blur(10px);
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        
+        .book-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tab-active {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+        
+        .tab-inactive {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+        
+        .tab-inactive:hover {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        
+        .status-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+        }
+        
+        .status-borrowed {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-overdue {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .status-returned {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-favorite {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background-color: #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+            transition: width 0.3s ease;
+        }
+        
+        .book-cover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            font-size: 0.875rem;
+            line-height: 1.2;
+        }
+        
+        .search-input {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .search-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+        
+        .filter-chip {
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .filter-chip:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .filter-chip.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">📚</span>
+                    </div>
+                    <h1 class="text-xl font-bold text-gray-900">Thư Viện Trung Tâm</h1>
+                </div>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium">Trang chủ</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium">Danh mục</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium">Dịch vụ</a>
+                    <a href="#" class="text-gray-700 hover:text-indigo-600 font-medium">Liên hệ</a>
+                </nav>
+                <div class="flex items-center space-x-4">
+                    <!-- User Menu -->
+                    <div class="relative">
+                        <button onclick="toggleUserMenu()" class="flex items-center space-x-3 bg-gray-100 hover:bg-gray-200 rounded-lg px-3 py-2 transition-colors">
+                            <div class="w-8 h-8 bg-gradient-to-br from-blue-400 to-red-500 rounded-full flex items-center justify-center">
+                                <span class="text-white text-sm font-bold">NVM</span>
+                            </div>
+                            <div class="hidden md:block text-left">
+                                <div class="text-sm font-medium text-gray-900">Nguyễn Văn Minh</div>
+                                <div class="text-xs text-gray-500">Thành viên</div>
+                            </div>
+                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div id="userDropdown" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                            <div class="p-4 border-b border-gray-100">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-red-500 rounded-full flex items-center justify-center">
+                                        <span class="text-white text-lg font-bold">NVM</span>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-900">Nguyễn Văn Minh</div>
+                                        <div class="text-sm text-gray-500">nguyenvanminh@gmail.com</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="py-2">
+                                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
+                                    Thông tin cá nhân
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-sm text-blue-600 bg-blue-50 font-medium">
+                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C20.168 18.477 18.582 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                    </svg>
+                                    Sách của tôi
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                    </svg>
+                                    Lịch sử mượn
+                                </a>
+                            </div>
+                            
+                            <div class="border-t border-gray-100 py-2">
+                                <button onclick="logout()" class="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                    <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                    </svg>
+                                    Đăng xuất
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-8" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="#" class="text-gray-700 hover:text-blue-600">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                        </svg>
+                        Trang chủ
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="ml-1 text-blue-600 font-medium">Sách của tôi</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Sách của tôi</h1>
+            <p class="text-gray-600">Quản lý sách đang mượn, lịch sử và danh sách yêu thích</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <span class="text-blue-600 text-xl">📖</span>
+                    </div>
+                    <div class="ml-4">
+                        <div class="text-2xl font-bold text-gray-900">3</div>
+                        <div class="text-sm text-gray-600">Đang mượn</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <span class="text-green-600 text-xl">✅</span>
+                    </div>
+                    <div class="ml-4">
+                        <div class="text-2xl font-bold text-gray-900">32</div>
+                        <div class="text-sm text-gray-600">Đã trả</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                        <span class="text-yellow-600 text-xl">⭐</span>
+                    </div>
+                    <div class="ml-4">
+                        <div class="text-2xl font-bold text-gray-900">15</div>
+                        <div class="text-sm text-gray-600">Yêu thích</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                        <span class="text-red-600 text-xl">⏰</span>
+                    </div>
+                    <div class="ml-4">
+                        <div class="text-2xl font-bold text-gray-900">0</div>
+                        <div class="text-sm text-gray-600">Quá hạn</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-8 border border-gray-200">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+                <div class="flex-1 max-w-md">
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input type="text" id="searchInput" placeholder="Tìm kiếm sách..." class="search-input w-full pl-10 pr-4 py-3" onkeyup="searchBooks()">
+                    </div>
+                </div>
+                
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterBooks('all')" class="filter-chip active" id="filter-all">Tất cả</button>
+                    <button onclick="filterBooks('borrowed')" class="filter-chip" id="filter-borrowed">Đang mượn</button>
+                    <button onclick="filterBooks('returned')" class="filter-chip" id="filter-returned">Đã trả</button>
+                    <button onclick="filterBooks('favorite')" class="filter-chip" id="filter-favorite">Yêu thích</button>
+                    <button onclick="filterBooks('overdue')" class="filter-chip" id="filter-overdue">Quá hạn</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="mb-8">
+            <div class="border-b border-gray-200">
+                <nav class="-mb-px flex space-x-8">
+                    <button onclick="switchTab('current')" id="currentTab" class="tab-active py-2 px-4 border-b-2 border-transparent font-medium text-sm rounded-t-lg transition-all">
+                        📚 Đang mượn (3)
+                    </button>
+                    <button onclick="switchTab('history')" id="historyTab" class="tab-inactive py-2 px-4 border-b-2 border-transparent font-medium text-sm rounded-t-lg transition-all">
+                        📜 Lịch sử (32)
+                    </button>
+                    <button onclick="switchTab('favorites')" id="favoritesTab" class="tab-inactive py-2 px-4 border-b-2 border-transparent font-medium text-sm rounded-t-lg transition-all">
+                        ⭐ Yêu thích (15)
+                    </button>
+                    <button onclick="switchTab('reading')" id="readingTab" class="tab-inactive py-2 px-4 border-b-2 border-transparent font-medium text-sm rounded-t-lg transition-all">
+                        📖 Đang đọc (2)
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Current Books Tab -->
+        <div id="currentContent" class="fade-in">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="currentBooks">
+                <!-- Book Card 1 -->
+                <div class="book-card bg-white rounded-xl shadow-sm p-6 book-item" data-category="borrowed" data-title="sapiens">
+                    <div class="flex space-x-4">
+                        <div class="w-20 h-28 book-cover rounded-lg flex-shrink-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <div class="p-2">Sapiens</div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between mb-2">
+                                <h3 class="font-semibold text-gray-900 text-lg">Sapiens</h3>
+                                <span class="status-badge status-borrowed">Đang mượn</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2">Yuval Noah Harari</p>
+                            <p class="text-gray-500 text-xs mb-3">Mượn: 15/01/2024</p>
+                            
+                            <div class="mb-3">
+                                <div class="flex justify-between text-sm text-gray-600 mb-1">
+                                    <span>Tiến độ đọc</span>
+                                    <span>65%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 65%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-green-600 font-medium">Còn 12 ngày</span>
+                                <div class="flex space-x-2">
+                                    <button onclick="renewBook('Sapiens')" class="text-blue-600 hover:text-blue-700">🔄 Gia hạn</button>
+                                    <button onclick="returnBook('Sapiens')" class="text-green-600 hover:text-green-700">📤 Trả sách</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Book Card 2 -->
+                <div class="book-card bg-white rounded-xl shadow-sm p-6 book-item" data-category="borrowed" data-title="dune">
+                    <div class="flex space-x-4">
+                        <div class="w-20 h-28 book-cover rounded-lg flex-shrink-0" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <div class="p-2">Dune</div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between mb-2">
+                                <h3 class="font-semibold text-gray-900 text-lg">Dune</h3>
+                                <span class="status-badge status-borrowed">Đang mượn</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2">Frank Herbert</p>
+                            <p class="text-gray-500 text-xs mb-3">Mượn: 10/01/2024</p>
+                            
+                            <div class="mb-3">
+                                <div class="flex justify-between text-sm text-gray-600 mb-1">
+                                    <span>Tiến độ đọc</span>
+                                    <span>30%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 30%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-green-600 font-medium">Còn 7 ngày</span>
+                                <div class="flex space-x-2">
+                                    <button onclick="renewBook('Dune')" class="text-blue-600 hover:text-blue-700">🔄 Gia hạn</button>
+                                    <button onclick="returnBook('Dune')" class="text-green-600 hover:text-green-700">📤 Trả sách</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Book Card 3 -->
+                <div class="book-card bg-white rounded-xl shadow-sm p-6 book-item" data-category="borrowed" data-title="clean code">
+                    <div class="flex space-x-4">
+                        <div class="w-20 h-28 book-cover rounded-lg flex-shrink-0" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <div class="p-2">Clean Code</div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between mb-2">
+                                <h3 class="font-semibold text-gray-900 text-lg">Clean Code</h3>
+                                <span class="status-badge status-borrowed">Đang mượn</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2">Robert C. Martin</p>
+                            <p class="text-gray-500 text-xs mb-3">Mượn: 20/01/2024</p>
+                            
+                            <div class="mb-3">
+                                <div class="flex justify-between text-sm text-gray-600 mb-1">
+                                    <span>Tiến độ đọc</span>
+                                    <span>85%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-green-600 font-medium">Còn 17 ngày</span>
+                                <div class="flex space-x-2">
+                                    <button onclick="renewBook('Clean Code')" class="text-blue-600 hover:text-blue-700">🔄 Gia hạn</button>
+                                    <button onclick="returnBook('Clean Code')" class="text-green-600 hover:text-green-700">📤 Trả sách</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Tab -->
+        <div id="historyContent" class="hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="historyBooks">
+                <!-- History Book 1 -->
+                <div class="book-card bg-white rounded-xl shadow-sm p-6 book-item" data-category="returned" data-title="the martian">
+                    <div class="flex space-x-4">
+                        <div class="w-20 h-28 book-cover rounded-lg flex-shrink-0" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                            <div class="p-2">The Martian</div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between mb-2">
+                                <h3 class="font-semibold text-gray-900 text-lg">The Martian</h3>
+                                <span class="status-badge status-returned">Đã trả</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2">Andy Weir</p>
+                            <p class="text-gray-500 text-xs mb-2">Mượn: 01/01/2024 - Trả: 14/01/2024</p>
+                            
+                            <div class="flex items-center mb-3">
+                                <span class="text-sm text-gray-600 mr-2">Đánh giá:</span>
+                                <div class="flex text-yellow-400">
+                                    <span>⭐⭐⭐⭐⭐</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-green-600 font-medium">Hoàn thành 100%</span>
+                                <div class="flex space-x-2">
+                                    <button onclick="addToFavorites('The Martian')" class="text-yellow-600 hover:text-yellow-700">⭐ Yêu thích</button>
+                                    <button onclick="borrowAgain('The Martian')" class="text-blue-600 hover:text-blue-700">📚 Mượn lại</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Book 2 -->
+                <div class="book-card bg-white rounded-xl shadow-sm p-6 book-item" data-category="returned" data-title="1984">
+                    <div class="flex space-x-4">
+                        <div class="w-20 h-28 book-cover rounded-lg flex-shrink-0" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                            <div class="p-2">1984</div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between mb-2">
+                                <h3 class="font-semibold text-gray-900 text-lg">1984</h3>
+                                <span class="status-badge status-returned">Đã trả</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2">George Orwell</p>
+                            <p class="text-gray-500 text-xs mb-2">Mượn: 15/12/2023 - Trả: 28/12/2023</p>
+                            
+                            <div class="flex items-center mb-3">
+                                <span class="text-sm text-gray-600 mr-2">Đánh giá:</span>
+                                <div class="flex text-yellow-400">
+                                    <span>⭐⭐⭐⭐⭐</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-green-600 font-medium">Hoàn thành 100%</span>
+                                <div class="flex space-x-2">
+                                    <button onclick="addToFavorites('1984')" class="text-yellow-600 hover:text-yellow-700">⭐ Yêu thích</button>
+                                    <button onclick="borrowAgain('1984')" class="text-blue-600 hover:text-blue-700">📚 Mượn lại</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Book 3 -->
+                <div class="book-card bg-white rounded-xl shadow-sm p-6 book-item" data-category="returned" data-title="atomic habits">
+                    <div class="flex space-x-4">
+                        <div class="w-20 h-28 book-cover rounded-lg flex-shrink-0" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
+                            <div class="p-2">Atomic Habits</div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between mb-2">
+                                <h3 class="font-semibold text-gray-900 text-lg">Atomic Habits</h3>
+                                <span class="status-badge status-returned">Đã trả</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2">James Clear</p>
+                            <p class="text-gray-500 text-xs mb-2">Mượn: 20/11/2023 - Trả: 03/12/2023</p>
+                            
+                            <div class="flex items-center mb-3">
+                                <span class="text-sm text-gray-600 mr-2">Đánh giá:</span>
+                                <div class="flex text-yellow-400">
+                                    <span>⭐⭐⭐⭐⭐</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-green-600 font-medium">Hoàn thành 100%</span>
+                                <div class="flex space-x-2">
+                                    <button onclick="addToFavorites('Atomic Habits')" class="text-yellow-600 hover:text-yellow-700">⭐ Yêu thích</button>
+                                    <button onclick="borrowAgain('Atomic Habits')" class="text-blue-600 hover:text-blue-700">📚 Mượn lại</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 text-center">
+                <button onclick="loadMoreHistory()" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors">
+                    📜 Xem thêm lịch sử
+                </button>
+            </div>
+        </div>
+
+        <!-- Favorites Tab -->
+        <div id="favoritesContent" class="hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="favoriteBooks">
+                <!-- Favorite Book 1 -->
+                <div class="book-card bg-white rounded-xl shadow-sm p-6 book-item" data-category="favorite" data-title="the alchemist">
+                    <div class="flex space-x-4">
+                        <div class="w-20 h-28 book-cover rounded-lg flex-shrink-0" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">
+                            <div class="p-2">The Alchemist</div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between mb-2">
+                                <h3 class="font-semibold text-gray-900 text-lg">The Alchemist</h3>
+                                <span class="status-badge status-favorite">Yêu thích</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2">Paulo Coelho</p>
+                            <p class="text-gray-500 text-xs mb-2">Thêm vào yêu thích: 15/12/2023</p>
+                            
+                            <div class="flex items-center mb-3">
+                                <span class="text-sm text-gray-600 mr-2">Đánh giá:</span>
+                                <div class="flex text-yellow-400">
+                                    <span>⭐⭐⭐⭐⭐</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-purple-600 font-medium">Đã đọc 2 lần</span>
+                                <div class="flex space-x-2">
+                                    <button onclick="removeFromFavorites('The Alchemist')" class="text-red-600 hover:text-red-700">❌ Bỏ thích</button>
+                                    <button onclick="borrowAgain('The Alchemist')" class="text-blue-600 hover:text-blue-700">📚 Mượn lại</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Favorite Book 2 -->
+                <div class="book-card bg-white rounded-xl shadow-sm p-6 book-item" data-category="favorite" data-title="thinking fast and slow">
+                    <div class="flex space-x-4">
+                        <div class="w-20 h-28 book-cover rounded-lg flex-shrink-0" style="background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);">
+                            <div class="p-2">Thinking Fast and Slow</div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between mb-2">
+                                <h3 class="font-semibold text-gray-900 text-lg">Thinking, Fast and Slow</h3>
+                                <span class="status-badge status-favorite">Yêu thích</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2">Daniel Kahneman</p>
+                            <p class="text-gray-500 text-xs mb-2">Thêm vào yêu thích: 10/11/2023</p>
+                            
+                            <div class="flex items-center mb-3">
+                                <span class="text-sm text-gray-600 mr-2">Đánh giá:</span>
+                                <div class="flex text-yellow-400">
+                                    <span>⭐⭐⭐⭐⭐</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-purple-600 font-medium">Đã đọc 1 lần</span>
+                                <div class="flex space-x-2">
+                                    <button onclick="removeFromFavorites('Thinking, Fast and Slow')" class="text-red-600 hover:text-red-700">❌ Bỏ thích</button>
+                                    <button onclick="borrowAgain('Thinking, Fast and Slow')" class="text-blue-600 hover:text-blue-700">📚 Mượn lại</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reading Tab -->
+        <div id="readingContent" class="hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="readingBooks">
+                <!-- Reading Book 1 -->
+                <div class="book-card bg-white rounded-xl shadow-sm p-6 book-item" data-category="reading" data-title="sapiens reading">
+                    <div class="flex space-x-4">
+                        <div class="w-20 h-28 book-cover rounded-lg flex-shrink-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <div class="p-2">Sapiens</div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between mb-2">
+                                <h3 class="font-semibold text-gray-900 text-lg">Sapiens</h3>
+                                <span class="status-badge" style="background-color: #e0f2fe; color: #0277bd;">Đang đọc</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2">Yuval Noah Harari</p>
+                            <p class="text-gray-500 text-xs mb-3">Bắt đầu đọc: 15/01/2024</p>
+                            
+                            <div class="mb-3">
+                                <div class="flex justify-between text-sm text-gray-600 mb-1">
+                                    <span>Tiến độ đọc</span>
+                                    <span>65%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 65%"></div>
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">Trang 260/400</div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-blue-600 font-medium">Đọc hôm nay: 45 phút</span>
+                                <div class="flex space-x-2">
+                                    <button onclick="updateProgress('Sapiens')" class="text-blue-600 hover:text-blue-700">📊 Cập nhật</button>
+                                    <button onclick="addNote('Sapiens')" class="text-green-600 hover:text-green-700">📝 Ghi chú</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reading Book 2 -->
+                <div class="book-card bg-white rounded-xl shadow-sm p-6 book-item" data-category="reading" data-title="clean code reading">
+                    <div class="flex space-x-4">
+                        <div class="w-20 h-28 book-cover rounded-lg flex-shrink-0" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <div class="p-2">Clean Code</div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between mb-2">
+                                <h3 class="font-semibold text-gray-900 text-lg">Clean Code</h3>
+                                <span class="status-badge" style="background-color: #e0f2fe; color: #0277bd;">Đang đọc</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-2">Robert C. Martin</p>
+                            <p class="text-gray-500 text-xs mb-3">Bắt đầu đọc: 20/01/2024</p>
+                            
+                            <div class="mb-3">
+                                <div class="flex justify-between text-sm text-gray-600 mb-1">
+                                    <span>Tiến độ đọc</span>
+                                    <span>85%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 85%"></div>
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">Trang 340/400</div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-blue-600 font-medium">Đọc hôm nay: 30 phút</span>
+                                <div class="flex space-x-2">
+                                    <button onclick="updateProgress('Clean Code')" class="text-blue-600 hover:text-blue-700">📊 Cập nhật</button>
+                                    <button onclick="addNote('Clean Code')" class="text-green-600 hover:text-green-700">📝 Ghi chú</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 max-w-md mx-4">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-green-600 text-2xl">✅</span>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">Thành công!</h3>
+                <p id="successMessage" class="text-gray-600 mb-6">Thao tác đã được thực hiện thành công.</p>
+                <button onclick="closeSuccessModal()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'current';
+        let currentFilter = 'all';
+
+        function switchTab(tabName) {
+            // Hide all content
+            document.getElementById('currentContent').classList.add('hidden');
+            document.getElementById('historyContent').classList.add('hidden');
+            document.getElementById('favoritesContent').classList.add('hidden');
+            document.getElementById('readingContent').classList.add('hidden');
+
+            // Reset all tabs
+            document.getElementById('currentTab').className = 'tab-inactive py-2 px-4 border-b-2 border-transparent font-medium text-sm rounded-t-lg transition-all';
+            document.getElementById('historyTab').className = 'tab-inactive py-2 px-4 border-b-2 border-transparent font-medium text-sm rounded-t-lg transition-all';
+            document.getElementById('favoritesTab').className = 'tab-inactive py-2 px-4 border-b-2 border-transparent font-medium text-sm rounded-t-lg transition-all';
+            document.getElementById('readingTab').className = 'tab-inactive py-2 px-4 border-b-2 border-transparent font-medium text-sm rounded-t-lg transition-all';
+
+            // Show selected content and activate tab
+            document.getElementById(tabName + 'Content').classList.remove('hidden');
+            document.getElementById(tabName + 'Tab').className = 'tab-active py-2 px-4 border-b-2 border-transparent font-medium text-sm rounded-t-lg transition-all';
+            
+            currentTab = tabName;
+        }
+
+        function filterBooks(category) {
+            // Update filter chips
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            document.getElementById('filter-' + category).classList.add('active');
+            
+            currentFilter = category;
+            
+            // Filter books
+            const books = document.querySelectorAll('.book-item');
+            books.forEach(book => {
+                if (category === 'all' || book.dataset.category === category) {
+                    book.style.display = 'block';
+                } else {
+                    book.style.display = 'none';
+                }
+            });
+        }
+
+        function searchBooks() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const books = document.querySelectorAll('.book-item');
+            
+            books.forEach(book => {
+                const title = book.dataset.title.toLowerCase();
+                if (title.includes(searchTerm)) {
+                    book.style.display = 'block';
+                } else {
+                    book.style.display = 'none';
+                }
+            });
+        }
+
+        function renewBook(bookTitle) {
+            showSuccessModal(`Đã gia hạn sách "${bookTitle}" thành công! Hạn trả mới: 30 ngày.`);
+        }
+
+        function returnBook(bookTitle) {
+            showSuccessModal(`Đã đánh dấu sách "${bookTitle}" để trả. Vui lòng mang sách đến thư viện.`);
+        }
+
+        function addToFavorites(bookTitle) {
+            showSuccessModal(`Đã thêm "${bookTitle}" vào danh sách yêu thích!`);
+        }
+
+        function removeFromFavorites(bookTitle) {
+            showSuccessModal(`Đã xóa "${bookTitle}" khỏi danh sách yêu thích!`);
+        }
+
+        function borrowAgain(bookTitle) {
+            showSuccessModal(`Đã đặt mượn lại sách "${bookTitle}". Sách sẽ sẵn sàng trong 1-2 ngày.`);
+        }
+
+        function updateProgress(bookTitle) {
+            const newProgress = prompt(`Nhập tiến độ đọc hiện tại cho "${bookTitle}" (0-100%):`);
+            if (newProgress && !isNaN(newProgress) && newProgress >= 0 && newProgress <= 100) {
+                showSuccessModal(`Đã cập nhật tiến độ đọc "${bookTitle}": ${newProgress}%`);
+            }
+        }
+
+        function addNote(bookTitle) {
+            const note = prompt(`Thêm ghi chú cho "${bookTitle}":`);
+            if (note && note.trim()) {
+                showSuccessModal(`Đã thêm ghi chú cho "${bookTitle}"!`);
+            }
+        }
+
+        function loadMoreHistory() {
+            showSuccessModal('Đang tải thêm lịch sử mượn sách...');
+        }
+
+        function showSuccessModal(message) {
+            document.getElementById('successMessage').textContent = message;
+            document.getElementById('successModal').classList.remove('hidden');
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.add('hidden');
+        }
+
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        function logout() {
+            alert('Đăng xuất thành công!');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const userMenu = document.querySelector('[onclick="toggleUserMenu()"]');
+            const dropdown = document.getElementById('userDropdown');
+            
+            if (userMenu && dropdown && !userMenu.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('successModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSuccessModal();
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97e8537e114a095c',t:'MTc1Nzc3MzY1NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

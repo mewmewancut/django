@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
 from .models import UserProfile
+from django.contrib.auth.decorators import login_required
 
 
 def register(request):
@@ -46,6 +47,17 @@ def register(request):
         # GET → render template form đăng ký
         return render(request, "accounts/register.html")
 
+@login_required
+def librarian_dashboard(request):
+    profile = UserProfile.objects.get(user=request.user)
+    if profile.role != 'librarian':
+        return redirect('home')
+    
+    # Chỉ lấy user có role là 'user'
+    users_only = UserProfile.objects.filter(role='user')
+    
+    return render(request, 'accounts/librarian_dashboard.html', {'users': users_only})
+from django.contrib.auth.models import Group
 
 def user_login(request):
     if request.method == "POST":
@@ -54,7 +66,15 @@ def user_login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect("home")
+
+            # 🔑 Kiểm tra role trong UserProfile
+            profile = UserProfile.objects.get(user=user)
+            if profile.role == 'librarian':
+                return redirect("librarian_dashboard")   # giao diện thủ thư
+            elif user.is_superuser:
+                return redirect("/admin/")               # admin
+            else:
+                return redirect("home")                  # người dùng thường
         else:
             messages.error(request, "Sai tên đăng nhập hoặc mật khẩu.")
     return render(request, "accounts/login.html")
@@ -120,4 +140,9 @@ def change_password(request):
 
     return render(request, 'accounts/change_password.html', {'form': form})
 
+from .models import UserProfile
 
+
+def danh_sach_nguoi_dung(request):
+    users = UserProfile.objects.select_related('user').all()  # lấy tất cả UserProfile kèm User
+    return render(request, 'users_list.html', {'users': users})

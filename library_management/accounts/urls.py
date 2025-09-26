@@ -9,5 +9,8 @@ urlpatterns = [
     path('home/', views.home, name='home'),
     path("change-password/", views.change_password, name="change_password"),
     path('librarian/', views.librarian_dashboard, name='librarian_dashboard'),
+    path('catalog/', views.catalog, name='catalog'), 
+    path('services/', views.services, name='services'),
+    path('contact/', views.contact, name='contact'),
 
 ]

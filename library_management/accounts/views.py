@@ -146,3 +146,11 @@ from .models import UserProfile
 def danh_sach_nguoi_dung(request):
     users = UserProfile.objects.select_related('user').all()  # lấy tất cả UserProfile kèm User
     return render(request, 'users_list.html', {'users': users})
+
+
+def catalog(request):
+    return render(request, "accounts/catalog.html")  # tạo template catalog.html
+def services(request):
+    return render(request, "accounts/services.html")  # tạo template services.html
+def contact(request):
+    return render(request, "accounts/contact.html")  # tạo template contact.html

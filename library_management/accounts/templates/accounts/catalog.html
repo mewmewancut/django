@@ -1,0 +1,390 @@
+{% extends "base.html" %}
+
+{% block title %}Thư viện{% endblock %}
+
+{% block extra_css%}
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .book-card:hover { transform: translateY(-4px); }
+        .hero-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .category-card:hover { transform: translateY(-2px); }
+        .filter-transition { transition: all 0.3s ease; }
+  
+{% endblock %}
+{% block content %}
+
+<body class="bg-gray-50">
+    <!-- Header -->
+    
+    <!-- Hero Section -->
+    <section class="hero-gradient text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">Danh Mục Sách</h2>
+                <p class="text-xl opacity-90 max-w-2xl mx-auto">Khám phá bộ sưu tập phong phú với hơn 50,000 đầu sách từ mọi lĩnh vực</p>
+            </div>
+            
+            <!-- Advanced Search -->
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-white rounded-xl p-6 shadow-lg">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <input type="text" id="searchTitle" placeholder="Tên sách..." 
+                               class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700">
+                        <input type="text" id="searchAuthor" placeholder="Tác giả..." 
+                               class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700">
+                        <select id="sortBy" class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-700">
+                            <option value="title">Sắp xếp theo tên</option>
+                            <option value="author">Sắp xếp theo tác giả</option>
+                            <option value="rating">Sắp xếp theo đánh giá</option>
+                            <option value="year">Sắp xếp theo năm xuất bản</option>
+                        </select>
+                    </div>
+                    <button onclick="performSearch()" class="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium">
+                        Tìm kiếm nâng cao
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Overview -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h3 class="text-3xl font-bold text-center text-gray-900 mb-12">Danh mục theo chủ đề</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                <div onclick="filterBooks('fiction')" class="category-card bg-gradient-to-br from-pink-400 to-red-500 text-white p-6 rounded-xl cursor-pointer transition-transform duration-300 text-center">
+                    <div class="text-3xl mb-3">📖</div>
+                    <h4 class="font-semibold mb-1">Tiểu thuyết</h4>
+                    <p class="text-sm opacity-90">1,250 cuốn</p>
+                </div>
+                <div onclick="filterBooks('science')" class="category-card bg-gradient-to-br from-blue-400 to-indigo-500 text-white p-6 rounded-xl cursor-pointer transition-transform duration-300 text-center">
+                    <div class="text-3xl mb-3">🔬</div>
+                    <h4 class="font-semibold mb-1">Khoa học</h4>
+                    <p class="text-sm opacity-90">890 cuốn</p>
+                </div>
+                <div onclick="filterBooks('history')" class="category-card bg-gradient-to-br from-yellow-400 to-orange-500 text-white p-6 rounded-xl cursor-pointer transition-transform duration-300 text-center">
+                    <div class="text-3xl mb-3">🏛️</div>
+                    <h4 class="font-semibold mb-1">Lịch sử</h4>
+                    <p class="text-sm opacity-90">670 cuốn</p>
+                </div>
+                <div onclick="filterBooks('technology')" class="category-card bg-gradient-to-br from-green-400 to-teal-500 text-white p-6 rounded-xl cursor-pointer transition-transform duration-300 text-center">
+                    <div class="text-3xl mb-3">💻</div>
+                    <h4 class="font-semibold mb-1">Công nghệ</h4>
+                    <p class="text-sm opacity-90">540 cuốn</p>
+                </div>
+                <div onclick="filterBooks('art')" class="category-card bg-gradient-to-br from-purple-400 to-pink-500 text-white p-6 rounded-xl cursor-pointer transition-transform duration-300 text-center">
+                    <div class="text-3xl mb-3">🎨</div>
+                    <h4 class="font-semibold mb-1">Nghệ thuật</h4>
+                    <p class="text-sm opacity-90">320 cuốn</p>
+                </div>
+                <div onclick="filterBooks('business')" class="category-card bg-gradient-to-br from-gray-400 to-gray-600 text-white p-6 rounded-xl cursor-pointer transition-transform duration-300 text-center">
+                    <div class="text-3xl mb-3">💼</div>
+                    <h4 class="font-semibold mb-1">Kinh doanh</h4>
+                    <p class="text-sm opacity-90">480 cuốn</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter and Results -->
+    <section class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Filter Bar -->
+            <div class="bg-white rounded-xl p-6 shadow-sm mb-8">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="filterBooks('all')" class="filter-btn bg-indigo-600 text-white px-6 py-2 rounded-full hover:bg-indigo-700 transition-colors">
+                            Tất cả
+                        </button>
+                        <button onclick="filterBooks('fiction')" class="filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-300 transition-colors">
+                            Tiểu thuyết
+                        </button>
+                        <button onclick="filterBooks('science')" class="filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-300 transition-colors">
+                            Khoa học
+                        </button>
+                        <button onclick="filterBooks('history')" class="filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-300 transition-colors">
+                            Lịch sử
+                        </button>
+                        <button onclick="filterBooks('technology')" class="filter-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-300 transition-colors">
+                            Công nghệ
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-gray-600">Hiển thị:</span>
+                        <select id="itemsPerPage" onchange="updateItemsPerPage()" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="12">12 sách</option>
+                            <option value="24">24 sách</option>
+                            <option value="48">48 sách</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Info -->
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h4 class="text-xl font-semibold text-gray-900">Kết quả tìm kiếm</h4>
+                    <p class="text-gray-600" id="resultsCount">Hiển thị 12 trong tổng số 1,250 cuốn sách</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-gray-600">Xem:</span>
+                    <button onclick="toggleView('grid')" id="gridView" class="p-2 bg-indigo-600 text-white rounded-lg">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                        </svg>
+                    </button>
+                    <button onclick="toggleView('list')" id="listView" class="p-2 bg-gray-200 text-gray-600 rounded-lg">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Books Grid -->
+            <div id="booksGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Books will be populated by JavaScript -->
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex justify-center items-center space-x-2">
+                <button onclick="changePage(-1)" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                    Trước
+                </button>
+                <div id="pagination" class="flex space-x-2">
+                    <!-- Pagination buttons will be generated by JavaScript -->
+                </div>
+                <button onclick="changePage(1)" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                    Sau
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-300 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>&copy; 2024 Thư Viện Trung Tâm. Tất cả quyền được bảo lưu.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Extended book data
+        const books = [
+            { id: 1, title: "Đắc Nhân Tâm", author: "Dale Carnegie", category: "fiction", available: true, rating: 4.8, year: 2018 },
+            { id: 2, title: "Sapiens", author: "Yuval Noah Harari", category: "history", available: true, rating: 4.9, year: 2020 },
+            { id: 3, title: "Tư Duy Nhanh Và Chậm", author: "Daniel Kahneman", category: "science", available: false, rating: 4.7, year: 2019 },
+            { id: 4, title: "Clean Code", author: "Robert C. Martin", category: "technology", available: true, rating: 4.6, year: 2021 },
+            { id: 5, title: "Nhà Giả Kim", author: "Paulo Coelho", category: "fiction", available: true, rating: 4.5, year: 2017 },
+            { id: 6, title: "Lược Sử Thời Gian", author: "Stephen Hawking", category: "science", available: true, rating: 4.8, year: 2020 },
+            { id: 7, title: "Việt Nam Sử Lược", author: "Trần Trọng Kim", category: "history", available: true, rating: 4.4, year: 2019 },
+            { id: 8, title: "JavaScript: The Good Parts", author: "Douglas Crockford", category: "technology", available: false, rating: 4.3, year: 2018 },
+            { id: 9, title: "Nghệ Thuật Bán Hàng", author: "Brian Tracy", category: "business", available: true, rating: 4.2, year: 2021 },
+            { id: 10, title: "Lịch Sử Nghệ Thuật", author: "Ernst Gombrich", category: "art", available: true, rating: 4.6, year: 2020 },
+            { id: 11, title: "Tâm Lý Học Tội Phạm", author: "Robert Hare", category: "science", available: true, rating: 4.4, year: 2019 },
+            { id: 12, title: "Chiến Tranh Và Hòa Bình", author: "Leo Tolstoy", category: "fiction", available: false, rating: 4.7, year: 2018 },
+            { id: 13, title: "Khởi Nghiệp Tinh Gọn", author: "Eric Ries", category: "business", available: true, rating: 4.3, year: 2020 },
+            { id: 14, title: "Vẽ Chân Dung", author: "Andrew Loomis", category: "art", available: true, rating: 4.5, year: 2021 },
+            { id: 15, title: "Lịch Sử Thế Giới", author: "H.G. Wells", category: "history", available: true, rating: 4.6, year: 2019 },
+            { id: 16, title: "Python Crash Course", author: "Eric Matthes", category: "technology", available: true, rating: 4.7, year: 2021 }
+        ];
+
+        let currentPage = 1;
+        let itemsPerPage = 12;
+        let currentBooks = [...books];
+        let currentView = 'grid';
+
+        // Display books
+        function displayBooks(booksToShow, page = 1) {
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedBooks = booksToShow.slice(startIndex, endIndex);
+            
+            const grid = document.getElementById('booksGrid');
+            
+            if (currentView === 'grid') {
+                grid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8';
+                grid.innerHTML = paginatedBooks.map(book => `
+                    <div class="book-card bg-white rounded-xl shadow-md overflow-hidden transition-transform duration-300 hover:shadow-lg">
+                        <div class="h-48 bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center">
+                            <span class="text-white text-4xl">📚</span>
+                        </div>
+                        <div class="p-6">
+                            <h4 class="font-semibold text-lg mb-2 text-gray-900">${book.title}</h4>
+                            <p class="text-gray-600 mb-1">Tác giả: ${book.author}</p>
+                            <p class="text-gray-500 text-sm mb-3">Năm xuất bản: ${book.year}</p>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center space-x-1">
+                                    <span class="text-yellow-400">⭐</span>
+                                    <span class="text-sm text-gray-600">${book.rating}</span>
+                                </div>
+                                <span class="px-3 py-1 text-xs rounded-full ${book.available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                    ${book.available ? 'Có sẵn' : 'Đã mượn'}
+                                </span>
+                            </div>
+                            <button onclick="borrowBook(${book.id})" 
+                                    class="w-full py-2 px-4 rounded-lg transition-colors ${book.available ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}"
+                                    ${!book.available ? 'disabled' : ''}>
+                                ${book.available ? 'Mượn sách' : 'Không có sẵn'}
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                grid.className = 'space-y-4 mb-8';
+                grid.innerHTML = paginatedBooks.map(book => `
+                    <div class="book-card bg-white rounded-xl shadow-md p-6 transition-transform duration-300 hover:shadow-lg">
+                        <div class="flex items-center space-x-6">
+                            <div class="w-20 h-28 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-white text-2xl">📚</span>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-xl mb-2 text-gray-900">${book.title}</h4>
+                                <p class="text-gray-600 mb-1">Tác giả: ${book.author}</p>
+                                <p class="text-gray-500 text-sm mb-2">Năm xuất bản: ${book.year}</p>
+                                <div class="flex items-center space-x-4 mb-3">
+                                    <div class="flex items-center space-x-1">
+                                        <span class="text-yellow-400">⭐</span>
+                                        <span class="text-sm text-gray-600">${book.rating}</span>
+                                    </div>
+                                    <span class="px-3 py-1 text-xs rounded-full ${book.available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                        ${book.available ? 'Có sẵn' : 'Đã mượn'}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <button onclick="borrowBook(${book.id})" 
+                                        class="py-2 px-6 rounded-lg transition-colors ${book.available ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}"
+                                        ${!book.available ? 'disabled' : ''}>
+                                    ${book.available ? 'Mượn sách' : 'Không có sẵn'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            updateResultsCount(booksToShow.length);
+            updatePagination(booksToShow.length);
+        }
+
+        // Filter books by category
+        function filterBooks(category) {
+            currentBooks = category === 'all' ? [...books] : books.filter(book => book.category === category);
+            currentPage = 1;
+            displayBooks(currentBooks, currentPage);
+            
+            // Update active filter button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            event.target.classList.remove('bg-gray-200', 'text-gray-700');
+            event.target.classList.add('bg-indigo-600', 'text-white');
+        }
+
+        // Advanced search
+        function performSearch() {
+            const titleSearch = document.getElementById('searchTitle').value.toLowerCase();
+            const authorSearch = document.getElementById('searchAuthor').value.toLowerCase();
+            const sortBy = document.getElementById('sortBy').value;
+            
+            let filteredBooks = books.filter(book => {
+                const titleMatch = !titleSearch || book.title.toLowerCase().includes(titleSearch);
+                const authorMatch = !authorSearch || book.author.toLowerCase().includes(authorSearch);
+                return titleMatch && authorMatch;
+            });
+            
+            // Sort books
+            filteredBooks.sort((a, b) => {
+                switch(sortBy) {
+                    case 'author':
+                        return a.author.localeCompare(b.author);
+                    case 'rating':
+                        return b.rating - a.rating;
+                    case 'year':
+                        return b.year - a.year;
+                    default:
+                        return a.title.localeCompare(b.title);
+                }
+            });
+            
+            currentBooks = filteredBooks;
+            currentPage = 1;
+            displayBooks(currentBooks, currentPage);
+        }
+
+        // Toggle view
+        function toggleView(view) {
+            currentView = view;
+            document.getElementById('gridView').classList.toggle('bg-indigo-600', view === 'grid');
+            document.getElementById('gridView').classList.toggle('text-white', view === 'grid');
+            document.getElementById('gridView').classList.toggle('bg-gray-200', view !== 'grid');
+            document.getElementById('gridView').classList.toggle('text-gray-600', view !== 'grid');
+            
+            document.getElementById('listView').classList.toggle('bg-indigo-600', view === 'list');
+            document.getElementById('listView').classList.toggle('text-white', view === 'list');
+            document.getElementById('listView').classList.toggle('bg-gray-200', view !== 'list');
+            document.getElementById('listView').classList.toggle('text-gray-600', view !== 'list');
+            
+            displayBooks(currentBooks, currentPage);
+        }
+
+        // Update items per page
+        function updateItemsPerPage() {
+            itemsPerPage = parseInt(document.getElementById('itemsPerPage').value);
+            currentPage = 1;
+            displayBooks(currentBooks, currentPage);
+        }
+
+        // Update results count
+        function updateResultsCount(total) {
+            const start = (currentPage - 1) * itemsPerPage + 1;
+            const end = Math.min(currentPage * itemsPerPage, total);
+            document.getElementById('resultsCount').textContent = `Hiển thị ${start}-${end} trong tổng số ${total} cuốn sách`;
+        }
+
+        // Update pagination
+        function updatePagination(totalItems) {
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const pagination = document.getElementById('pagination');
+            
+            pagination.innerHTML = '';
+            for (let i = 1; i <= totalPages; i++) {
+                const button = document.createElement('button');
+                button.textContent = i;
+                button.className = `px-4 py-2 rounded-lg transition-colors ${i === currentPage ? 'bg-indigo-600 text-white' : 'bg-white border border-gray-300 hover:bg-gray-50'}`;
+                button.onclick = () => {
+                    currentPage = i;
+                    displayBooks(currentBooks, currentPage);
+                };
+                pagination.appendChild(button);
+            }
+        }
+
+        // Change page
+        function changePage(direction) {
+            const totalPages = Math.ceil(currentBooks.length / itemsPerPage);
+            const newPage = currentPage + direction;
+            
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                displayBooks(currentBooks, currentPage);
+            }
+        }
+
+        // Borrow book function
+        function borrowBook(bookId) {
+            const book = books.find(b => b.id === bookId);
+            if (book && book.available) {
+                alert(`Bạn đã mượn thành công cuốn sách "${book.title}". Vui lòng đến quầy thủ thư để hoàn tất thủ tục.`);
+                book.available = false;
+                displayBooks(currentBooks, currentPage);
+            }
+        }
+
+        // Initialize page
+        displayBooks(books);
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97e6d15c33c1b451',t:'MTc1Nzc1NzgzOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+{% endblock %}

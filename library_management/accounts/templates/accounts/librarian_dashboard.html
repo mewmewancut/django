@@ -47,8 +47,24 @@
                     </div>
                 </div>
                 <div class="text-right">
-                    <p class="text-sm text-gray-600">Thủ thư: <span class="font-semibold">Nguyễn Văn A</span></p>
-                    <p class="text-xs text-gray-500">20/12/2024 14:30:25</p>
+                    <p class="text-sm text-gray-600">Thủ thư: <span class="font-semibold">{{librarian_name}}</span></p>   
+                    <p id="real-time" class="text-xs text-gray-500"></p>
+                        <script>
+                            function updateTime() {
+                                const now = new Date();
+                                const formatted = now.toLocaleString("vi-VN", {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    second: "2-digit"
+                                });
+                                document.getElementById("real-time").textContent = formatted;
+                            }
+                            updateTime();
+                            setInterval(updateTime, 1000);
+                        </script>
                     <button class="mt-2 text-xs bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition-colors">
                         👤 Thông Tin Cá Nhân
                     </button>
@@ -454,7 +470,8 @@
     {% endfor %}
 </div>
 
-
+    </div>
+</div>
 
         <!-- Kiểm Tra Tình Trạng Section -->
         <div id="kiemTraTinhTrang" class="section bg-white rounded-xl shadow-lg p-6 mb-6 card-hover transition-all duration-300 hidden">
@@ -593,7 +610,6 @@
                 }
             }
         }
-
         // Chuyển đổi giữa các tab trong section Mượn/Trả Sách
         function showBorrowTab(tabName, buttonElement) {
             // Ẩn tất cả borrow content

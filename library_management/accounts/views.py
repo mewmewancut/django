@@ -55,8 +55,17 @@ def librarian_dashboard(request):
     
     # Chỉ lấy user có role là 'user'
     users_only = UserProfile.objects.filter(role='user')
-    
-    return render(request, 'accounts/librarian_dashboard.html', {'users': users_only})
+    librarian_name=profile.name
+    return render(
+        request,
+        'accounts/librarian_dashboard.html',
+        {
+            'users': users_only,
+            'librarian_name': librarian_name , # truyền thủ thư xuống template
+            'profile': profile,
+        }
+    )
+
 from django.contrib.auth.models import Group
 
 def user_login(request):
